@@ -11,7 +11,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+var geocoder = new google.maps.Geocoder;
 
+latitude = 17.385;
+longitude = 78.4867;
+var latlng = {
+    lat: parseFloat(latitude),
+    lng: parseFloat(longitude)
+};
+
+geocoder.geocode({
+    'location': latlng
+}, function(results, status) {
+    if (status === google.maps.GeocoderStatus.OK) {
+        if (results[1]) {
+            console.log("place_id :" + results[1].place_id);
+        } else {
+            window.alert('No results found');
+        }
+    } else {
+        window.alert('Geocoder failed due to: ' + status);
+    }
+});
 var positions = [
     [40.7033127, -73.979681], // NY
     [34.0204989, -118.4117325], // LA
@@ -311,8 +332,8 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
 
         card.querySelector('.description').textContent = current.text;
         card.querySelector('.date').textContent = current.date;
-        card.querySelector('.current .icon').classList.add(app.getIconClass(current.code));
-        card.querySelector('.current .temperature .value').textContent =
+        card.querySelector('.current .icon').classList.add("distance-earth");
+        card.querySelector('.current .distance .value').textContent =
             Math.round(current.temp);
         card.querySelector('.current .sunrise').textContent = sunrise;
         card.querySelector('.current .sunset').textContent = sunset;
@@ -363,44 +384,61 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
         var statement = 'select * from weather.forecast where woeid=' + key + " and u='c'";
         var url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
             statement;
-        // TODO add cache logic here
-        if ('caches' in window) {
-            /*
-             * Check if the service worker has already cached this city's weather
-             * data. If the service worker has the data, then display the cached
-             * data while the app fetches the latest data.
-             */
-            caches.match(url).then(function(response) {
-                if (response) {
-                    response.json().then(function updateFromCache(json) {
-                        var results = json.query.results;
-                        results.key = key;
-                        results.label = label;
-                        results.created = json.query.created;
-                        app.updateForecastCard(results);
-                    });
-                }
-            });
-        }
+        // // TODO add cache logic here
+        // if ('caches' in window) {
+        //     /*
+        //      * Check if the service worker has already cached this city's weather
+        //      * data. If the service worker has the data, then display the cached
+        //      * data while the app fetches the latest data.
+        //      */
+        //     caches.match(url).then(function(response) {
+        //         if (response) {
+        //             response.json().then(function updateFromCache(json) {
+        //                 var results = json.query.results;
+        //                 results.key = key;
+        //                 results.label = label;
+        //                 results.created = json.query.created;
+        //                 app.updateForecastCard(results);
+        //             });
+        //         }
+        //     });
+        // }
         // Fetch the latest data.
-        var request = new XMLHttpRequest();
-        request.onreadystatechange = function() {
-            if (request.readyState === XMLHttpRequest.DONE) {
-                if (request.status === 200) {
-                    var response = JSON.parse(request.response);
-                    var results = response.query.results;
-                    results.key = key;
-                    results.label = label;
-                    results.created = response.query.created;
-                    app.updateForecastCard(results);
-                }
-            } else {
-                // Return the initial weather forecast since no data is available.
-                app.updateForecastCard(initialWeatherForecast);
+        // var request = new XMLHttpRequest();
+        // request.onreadystatechange = function() {
+        //     if (request.readyState === XMLHttpRequest.DONE) {
+        //         if (request.status === 200) {
+        //             var response = JSON.parse(request.response);
+        //             var results = response.query.results;
+        //             results.key = key;
+        //             results.label = label;
+        //             results.created = response.query.created;
+        //             app.updateForecastCard(results);
+        //         }
+        //     } else {
+        //         // Return the initial weather forecast since no data is available.
+        //         app.updateForecastCard(initialWeatherForecast);
+        //     }
+        // };
+        // request.open('GET', url);
+        // request.send();
+        var data = null;
+
+        var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function() {
+            if (this.readyState === 4) {
+                console.log(this.responseText);
             }
-        };
-        request.open('GET', url);
-        request.send();
+        });
+
+        xhr.open("GET", "https://api.uber.com/v1.2/history?limit=50");
+        xhr.setRequestHeader("authorization", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOlsiaGlzdG9yeSIsImhpc3RvcnlfbGl0ZSIsInBsYWNlcyIsInByb2ZpbGUiLCJyaWRlX3dpZGdldHMiXSwic3ViIjoiNzEyMGU5YjktYTkyMi00ODk1LWI3MWItMTE3ZTEyYjJlYzhkIiwiaXNzIjoidWJlci11czEiLCJqdGkiOiJiOTc3YWY5ZC1iZjJkLTRiMWMtYTMwYy04MTM2ZGRhYWRkNzkiLCJleHAiOjE0OTI2MTYyNDUsImlhdCI6MTQ5MDAyNDI0NSwidWFjdCI6Im9qcGRkQVpFeDQzM3l3VkJiR2VmSFVLd3lQeTNtMyIsIm5iZiI6MTQ5MDAyNDE1NSwiYXVkIjoiMm9FUlg4RXNpanlSdDhBbEY4cFpwQ2ZFTUZLSXdNOHAifQ.j7vUaP0VYf0BEYzXEBcvFMIVx_GQPU8opgPsXeRjx0YuINoxZRlw0qNzwoy-nLiGSXD79ILKWDZVthIRHXA0i0aPaHmYKCOIAbWU3aZTlgs5xyHsesbwVGruBOTguGpFY8OvLqcI46SzTPdSQs8UNi933z5hKKr2BuA81THCZjf-UJus9gYwV-jA08JHQfw7ga3QT7-Eq2lVaG0QYPqVJSlCoPb0k7efuCVtpHWmJgzbZR6KXAWTODR453ZQNZv3nRm0ObHPPBsuAVj2VpwgW1Deyoh0GuPdFSVC2nicIzmeLmkh4Yel67iyAnIniTBccQKb6_PQYkfixQeFWNUkHg");
+        //  xhr.setRequestHeader("cache-control", "no-cache");
+        //  xhr.setRequestHeader("Access-Control-Allow-Credentials", "*");
+
+        xhr.send(data);
     };
 
     // Iterate all of the cards and attempt to get the latest forecast data

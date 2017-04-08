@@ -21,11 +21,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="canonical" href="https://nitrek.github.io/UberStats/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather PWA</title>
+  <title>Uber Stats</title>
   <link rel="stylesheet" type="text/css" href="styles/inline.css">
-  <script async defer
-   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmwAiBuqta6X0LGr-WG661jrQtRoiRNHM&callback=initMap">
-   </script>
   <!-- TODO add manifest here -->
   <link rel="manifest" href="/manifest.json">
   <!-- Add to home screen for Safari on iOS -->
@@ -39,13 +36,13 @@
 <body>
 <div id="googlemaps"></div>
   <header class="header">
-    <h1 class="header__title">UBERStats</h1>
+    <h1 class="header__title">UBER Stats</h1>
     <button id="butRefresh" class="headerButton" aria-label="Refresh"></button>
     <button id="butAdd" class="headerButton" aria-label="Add"></button>
   </header>
 
   <main class="main">
-    <div class="card cardTemplate weather-forecast" hidden>
+    <div class="card cardTemplate stats-card" hidden>
       <div class="city-key" hidden></div>
       <div class="card-last-updated" hidden></div>
       <div class="location"></div>
@@ -54,8 +51,8 @@
       <div class="current">
         <div class="visual">
           <div class="icon"></div>
-          <div class="temperature">
-            <span class="value"></span><span class="scale">°C</span>
+          <div class="distance">
+            <span class="value"></span><span class="scale">KM</span>
           </div>
         </div>
         <div class="description">
@@ -67,78 +64,6 @@
           </div>
           <div class="sunrise"></div>
           <div class="sunset"></div>
-        </div>
-      </div>
-      <div class="future">
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
         </div>
       </div>
     </div>
@@ -174,7 +99,10 @@
   </div>
 
   <!-- Uncomment the line below when ready to test with fake data -->
-  <script src="scripts/app.js" async></script>
-
+  <!-- async defer  -->
+  <script
+   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHM_UTjNpf2JqRE7-JCcQGUBBmlBYl530&callback=initMap">
+   </script>
+   <script src="scripts/app.js" async></script>
 </body>
 </html>
