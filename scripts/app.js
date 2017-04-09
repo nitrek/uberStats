@@ -482,6 +482,8 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
                 }).then(function() {
                     console.log("done fetching");
                     console.log(JSON.stringify(result.history));
+                    result.key = "total";
+                    app.updateForecastCard(result)
                 }).catch(function(e) {
                     console.log("error", e);
                 });
