@@ -299,65 +299,21 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
     // Updates a weather card with the latest weather forecast. If the card
     // doesn't already exist, it's cloned from the template.
     app.updateForecastCard = function(data) {
-        var dataLastUpdated = new Date(data.created);
-        var sunrise = data.channel.astronomy.sunrise;
-        var sunset = data.channel.astronomy.sunset;
-        var current = data.channel.item.condition;
-        var humidity = data.channel.atmosphere.humidity;
-        var wind = data.channel.wind;
+        //var dataLastUpdated = new Date(data.created);
+        var totalRides = data.count;
 
         var card = app.visibleCards[data.key];
         if (!card) {
             card = app.cardTemplate.cloneNode(true);
             card.classList.remove('cardTemplate');
-            card.querySelector('.location').textContent = data.label;
+            card.querySelector('.location').textContent = "Total";
             card.removeAttribute('hidden');
             app.container.appendChild(card);
             app.visibleCards[data.key] = card;
         }
+        card.querySelector('.location').textContent = "Total";
+        card.querySelector('.numRides').textContent = data.count;
 
-        // Verifies the data provide is newer than what's already visible
-        // on the card, if it's not bail, if it is, continue and update the
-        // time saved in the card
-        var cardLastUpdatedElem = card.querySelector('.card-last-updated');
-        var cardLastUpdated = cardLastUpdatedElem.textContent;
-        if (cardLastUpdated) {
-            cardLastUpdated = new Date(cardLastUpdated);
-            // Bail if the card has more recent data then the data
-            if (dataLastUpdated.getTime() < cardLastUpdated.getTime()) {
-                return;
-            }
-        }
-        cardLastUpdatedElem.textContent = data.created;
-
-        card.querySelector('.description').textContent = current.text;
-        card.querySelector('.date').textContent = current.date;
-        card.querySelector('.current .icon').classList.add("distance-earth");
-        card.querySelector('.current .distance .value').textContent =
-            Math.round(current.temp);
-        card.querySelector('.current .sunrise').textContent = sunrise;
-        card.querySelector('.current .sunset').textContent = sunset;
-        card.querySelector('.current .humidity').textContent =
-            Math.round(humidity) + '%';
-        card.querySelector('.current .wind .value').textContent =
-            Math.round(wind.speed);
-        card.querySelector('.current .wind .direction').textContent = wind.direction;
-        var nextDays = card.querySelectorAll('.future .oneday');
-        var today = new Date();
-        today = today.getDay();
-        for (var i = 0; i < 7; i++) {
-            var nextDay = nextDays[i];
-            var daily = data.channel.item.forecast[i];
-            if (daily && nextDay) {
-                nextDay.querySelector('.date').textContent =
-                    app.daysOfWeek[(i + today) % 7];
-                nextDay.querySelector('.icon').classList.add(app.getIconClass(daily.code));
-                nextDay.querySelector('.temp-high .value').textContent =
-                    Math.round(daily.high);
-                nextDay.querySelector('.temp-low .value').textContent =
-                    Math.round(daily.low);
-            }
-        }
         if (app.isLoading) {
             app.spinner.setAttribute('hidden', true);
             app.container.removeAttribute('hidden');
@@ -381,9 +337,7 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
      * freshest data.
      */
     app.getForecast = function(key, label) {
-        var statement = 'select * from weather.forecast where woeid=' + key + " and u='c'";
-        var url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
-            statement;
+
         // // TODO add cache logic here
         // if ('caches' in window) {
         //     /*
@@ -421,32 +375,124 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
         //     }
         // };
         // request.open('GET', url);
-        // request.send();
-        var data = null;
+        // // request.send();
+        // var data = null;
+        // //total
+        // var xhr = new XMLHttpRequest();
+        // var results = {};
+        // var rideTime = 0;
+        // var WaitTime = 0;
+        // var numberOfKm = 0;
+        // var numberOfCities = 0;
+        var url = "https://api.uber.com/v1.2/history?limit=50"
+        // xhr.addEventListener("readystatechange", function() {
+        //     if (this.readyState === 4) {
+        //         console.log(this.responseText);
+        //         var results = JSON.parse(this.responseText);
+        //         results.key = "total"
+        //         var count = results.count;
+        //         while (count > 50) {
+        //             count = count - 50;
+        //             var offset = count;
+        //             if (offset > 50)
+        //                 offset = 50;
+        //
+        //             var xhrinner = new XMLHttpRequest();
+        //             xhrinner.addEventListener("readystatechange", function() {
+        //                 if (this.readyState === 4) {
+        //                     var results1 = JSON.parse(this.responseText);
+        //                     results.history = results.history + results1.history;
+        //                 }
+        //             });
+        //             xhrinner.open("GET", url + "&offset=" + offset);
+        //             xhrinner.setRequestHeader("authorization", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOlsiaGlzdG9yeSIsImhpc3RvcnlfbGl0ZSIsInBsYWNlcyIsInByb2ZpbGUiLCJyaWRlX3dpZGdldHMiXSwic3ViIjoiNzEyMGU5YjktYTkyMi00ODk1LWI3MWItMTE3ZTEyYjJlYzhkIiwiaXNzIjoidWJlci11czEiLCJqdGkiOiJiOTc3YWY5ZC1iZjJkLTRiMWMtYTMwYy04MTM2ZGRhYWRkNzkiLCJleHAiOjE0OTI2MTYyNDUsImlhdCI6MTQ5MDAyNDI0NSwidWFjdCI6Im9qcGRkQVpFeDQzM3l3VkJiR2VmSFVLd3lQeTNtMyIsIm5iZiI6MTQ5MDAyNDE1NSwiYXVkIjoiMm9FUlg4RXNpanlSdDhBbEY4cFpwQ2ZFTUZLSXdNOHAifQ.j7vUaP0VYf0BEYzXEBcvFMIVx_GQPU8opgPsXeRjx0YuINoxZRlw0qNzwoy-nLiGSXD79ILKWDZVthIRHXA0i0aPaHmYKCOIAbWU3aZTlgs5xyHsesbwVGruBOTguGpFY8OvLqcI46SzTPdSQs8UNi933z5hKKr2BuA81THCZjf-UJus9gYwV-jA08JHQfw7ga3QT7-Eq2lVaG0QYPqVJSlCoPb0k7efuCVtpHWmJgzbZR6KXAWTODR453ZQNZv3nRm0ObHPPBsuAVj2VpwgW1Deyoh0GuPdFSVC2nicIzmeLmkh4Yel67iyAnIniTBccQKb6_PQYkfixQeFWNUkHg");
+        //             //  xhr.setRequestHeader("cache-control", "no-cache");
+        //             //  xhr.setRequestHeader("Access-Control-Allow-Credentials", "*");
+        //
+        //             xhrinner.send(data);
+        //
+        //         }
+        //         console.log(results);
+        //     }
+        // });
+        //
+        // xhr.open("GET", url);
+        // xhr.setRequestHeader("authorization", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOlsiaGlzdG9yeSIsImhpc3RvcnlfbGl0ZSIsInBsYWNlcyIsInByb2ZpbGUiLCJyaWRlX3dpZGdldHMiXSwic3ViIjoiNzEyMGU5YjktYTkyMi00ODk1LWI3MWItMTE3ZTEyYjJlYzhkIiwiaXNzIjoidWJlci11czEiLCJqdGkiOiJiOTc3YWY5ZC1iZjJkLTRiMWMtYTMwYy04MTM2ZGRhYWRkNzkiLCJleHAiOjE0OTI2MTYyNDUsImlhdCI6MTQ5MDAyNDI0NSwidWFjdCI6Im9qcGRkQVpFeDQzM3l3VkJiR2VmSFVLd3lQeTNtMyIsIm5iZiI6MTQ5MDAyNDE1NSwiYXVkIjoiMm9FUlg4RXNpanlSdDhBbEY4cFpwQ2ZFTUZLSXdNOHAifQ.j7vUaP0VYf0BEYzXEBcvFMIVx_GQPU8opgPsXeRjx0YuINoxZRlw0qNzwoy-nLiGSXD79ILKWDZVthIRHXA0i0aPaHmYKCOIAbWU3aZTlgs5xyHsesbwVGruBOTguGpFY8OvLqcI46SzTPdSQs8UNi933z5hKKr2BuA81THCZjf-UJus9gYwV-jA08JHQfw7ga3QT7-Eq2lVaG0QYPqVJSlCoPb0k7efuCVtpHWmJgzbZR6KXAWTODR453ZQNZv3nRm0ObHPPBsuAVj2VpwgW1Deyoh0GuPdFSVC2nicIzmeLmkh4Yel67iyAnIniTBccQKb6_PQYkfixQeFWNUkHg");
+        // //  xhr.setRequestHeader("cache-control", "no-cache");
+        // //  xhr.setRequestHeader("Access-Control-Allow-Credentials", "*");
+        //
+        // xhr.send(data);
+        //promise
+        var myHeaders = new Headers();
+        myHeaders.append("authorization", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOlsiaGlzdG9yeSIsImhpc3RvcnlfbGl0ZSIsInBsYWNlcyIsInByb2ZpbGUiLCJyaWRlX3dpZGdldHMiXSwic3ViIjoiNzEyMGU5YjktYTkyMi00ODk1LWI3MWItMTE3ZTEyYjJlYzhkIiwiaXNzIjoidWJlci11czEiLCJqdGkiOiJiOTc3YWY5ZC1iZjJkLTRiMWMtYTMwYy04MTM2ZGRhYWRkNzkiLCJleHAiOjE0OTI2MTYyNDUsImlhdCI6MTQ5MDAyNDI0NSwidWFjdCI6Im9qcGRkQVpFeDQzM3l3VkJiR2VmSFVLd3lQeTNtMyIsIm5iZiI6MTQ5MDAyNDE1NSwiYXVkIjoiMm9FUlg4RXNpanlSdDhBbEY4cFpwQ2ZFTUZLSXdNOHAifQ.j7vUaP0VYf0BEYzXEBcvFMIVx_GQPU8opgPsXeRjx0YuINoxZRlw0qNzwoy-nLiGSXD79ILKWDZVthIRHXA0i0aPaHmYKCOIAbWU3aZTlgs5xyHsesbwVGruBOTguGpFY8OvLqcI46SzTPdSQs8UNi933z5hKKr2BuA81THCZjf-UJus9gYwV-jA08JHQfw7ga3QT7-Eq2lVaG0QYPqVJSlCoPb0k7efuCVtpHWmJgzbZR6KXAWTODR453ZQNZv3nRm0ObHPPBsuAVj2VpwgW1Deyoh0GuPdFSVC2nicIzmeLmkh4Yel67iyAnIniTBccQKb6_PQYkfixQeFWNUkHg");
+        var myInit = {
+            method: 'GET',
+            headers: myHeaders,
+            mode: 'cors',
+            cache: 'default'
+        };
 
-        var xhr = new XMLHttpRequest();
-        xhr.withCredentials = true;
+        var myRequest = new Request(url);
+        var result = {};
+        var count = 0;
+        var offset = 0;
+        fetch(myRequest, myInit).then(function(response) {
+            console.log("fsf");
+            response.json().then(function(json) {
+                console.log(json);
+                result = json;
+                count = json.count;
+                // result = JSON.parse(response);
+                if (count > 50) {
+                    offset = 50;
+                } else {
+                    offset = 0;
+                }
+                console.log("offsetof" + offset);
 
-        xhr.addEventListener("readystatechange", function() {
-            if (this.readyState === 4) {
-                console.log(this.responseText);
-            }
+                Promise.prototype.thenReturn = function(value) {
+                    return this.then(function() {
+                        return value;
+                    });
+                };
+
+                function fetchRemHostory(offsetLoop) {
+                    var myRequestinner = new Request(url + "&offset=" + offsetLoop);
+                    return new Promise(function(resolve) {
+                        fetch(myRequestinner, myInit).then(function(responseInner) {
+                            responseInner.json().then(function(jsonInner) {
+                                result.history = result.history.concat(jsonInner.history);
+                                //  result.history.length = result.history.length + jsonInner.history.length;
+                            });
+                            console.log(offsetLoop + "offsetLoop");
+                            resolve();
+                        })
+                    });
+                }
+
+                // The loop initialization
+                Promise.resolve(offset).then(function loop(i) {
+                    // The loop check
+                    if (i < count) { // The post iteration increment
+                        return fetchRemHostory(i).thenReturn((count - i) > 0 ? i + 50 : 0).then(loop);
+                    }
+                }).then(function() {
+                    console.log("done fetching");
+                    console.log(result.history.length);
+                }).catch(function(e) {
+                    console.log("error", e);
+                });
+            });
+            console.log("toooooooooooooooooooooooooooooooootal");
+            console.log(result.history.length);
         });
-
-        xhr.open("GET", "https://api.uber.com/v1.2/history?limit=50");
-        xhr.setRequestHeader("authorization", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOlsiaGlzdG9yeSIsImhpc3RvcnlfbGl0ZSIsInBsYWNlcyIsInByb2ZpbGUiLCJyaWRlX3dpZGdldHMiXSwic3ViIjoiNzEyMGU5YjktYTkyMi00ODk1LWI3MWItMTE3ZTEyYjJlYzhkIiwiaXNzIjoidWJlci11czEiLCJqdGkiOiJiOTc3YWY5ZC1iZjJkLTRiMWMtYTMwYy04MTM2ZGRhYWRkNzkiLCJleHAiOjE0OTI2MTYyNDUsImlhdCI6MTQ5MDAyNDI0NSwidWFjdCI6Im9qcGRkQVpFeDQzM3l3VkJiR2VmSFVLd3lQeTNtMyIsIm5iZiI6MTQ5MDAyNDE1NSwiYXVkIjoiMm9FUlg4RXNpanlSdDhBbEY4cFpwQ2ZFTUZLSXdNOHAifQ.j7vUaP0VYf0BEYzXEBcvFMIVx_GQPU8opgPsXeRjx0YuINoxZRlw0qNzwoy-nLiGSXD79ILKWDZVthIRHXA0i0aPaHmYKCOIAbWU3aZTlgs5xyHsesbwVGruBOTguGpFY8OvLqcI46SzTPdSQs8UNi933z5hKKr2BuA81THCZjf-UJus9gYwV-jA08JHQfw7ga3QT7-Eq2lVaG0QYPqVJSlCoPb0k7efuCVtpHWmJgzbZR6KXAWTODR453ZQNZv3nRm0ObHPPBsuAVj2VpwgW1Deyoh0GuPdFSVC2nicIzmeLmkh4Yel67iyAnIniTBccQKb6_PQYkfixQeFWNUkHg");
-        //  xhr.setRequestHeader("cache-control", "no-cache");
-        //  xhr.setRequestHeader("Access-Control-Allow-Credentials", "*");
-
-        xhr.send(data);
     };
 
     // Iterate all of the cards and attempt to get the latest forecast data
     app.updateForecasts = function() {
-        var keys = Object.keys(app.visibleCards);
-        keys.forEach(function(key) {
-            app.getForecast(key);
-        });
+
+        app.getForecast(key);
+
     };
 
     // TODO add saveSelectedCities function here

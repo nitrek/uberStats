@@ -262,7 +262,7 @@ body {
 .stats-card .location {
   font-size: 1.75em; }
 
-.stats-card .date, .stats-card .description {
+.stats-card .date, .stats-card  {
   font-size: 1.25em; }
 
 .stats-card .current {
@@ -281,29 +281,24 @@ body {
     font-size: 4em; }
     .stats-card .current .visual .scale {
       font-size: 1em;}
-  .stats-card .current .visual, .stats-card .current .description {
+  .stats-card .current .visual, .stats-card .current {
     -webkit-box-flex: 1;
     -webkit-flex-grow: 1;
         -ms-flex-positive: 1;
             flex-grow: 1; }
-  .stats-card .current .sunset:before {
-    content: "Sunset: ";
+  .stats-card .current .RideTime:before {
+    content: "Ride Time: ";
     color: #888; }
-  .stats-card .current .wind:before {
-    content: "Wind: ";
+  .stats-card .current .numRides:before {
+    content: "Number of Rides: ";
     color: #888; }
-  .stats-card .current .sunrise:before {
-    content: "Sunrise: ";
+  .stats-card .current .WaitTime:before {
+    content: "Wait Time: ";
     color: #888; }
-  .stats-card .current .humidity:before {
-    content: "Humidity: ";
+  .stats-card .current .numCities:before {
+    content: "Number of Citites: ";
     color: #888; }
-  .stats-card .current .pollen:before {
-    content: "Pollen Count: ";
-    color: #888; }
-  .stats-card .current .pcount:before {
-    content: "Pollen ";
-    color: #888; }
+
 /*
 .stats-card .future {
   display: -webkit-box;
