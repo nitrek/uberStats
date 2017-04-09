@@ -463,9 +463,12 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
                             responseInner.json().then(function(jsonInner) {
                                 result.history = result.history.concat(jsonInner.history);
                                 //  result.history.length = result.history.length + jsonInner.history.length;
+                                console.log(jsonInner.history.length + " <-----------------");
+                                console.log(result.history.length);
+                                resolve();
                             });
                             console.log(offsetLoop + "offsetLoop");
-                            resolve();
+
                         })
                     });
                 }
@@ -478,13 +481,13 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
                     }
                 }).then(function() {
                     console.log("done fetching");
-                    console.log(result.history.length);
+                    console.log(JSON.stringify(result.history));
                 }).catch(function(e) {
                     console.log("error", e);
                 });
             });
-            console.log("toooooooooooooooooooooooooooooooootal");
-            console.log(result.history.length);
+            //console.log("toooooooooooooooooooooooooooooooootal");
+            //console.log(result.history.length);
         });
     };
 
