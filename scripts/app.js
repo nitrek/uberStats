@@ -86,48 +86,111 @@
     // Updates a weather card with the latest weather forecast. If the card
     // doesn't already exist, it's cloned from the template.
     // result city-name: distance: numberofrides: waittime: ridetime:
+
     app.findCityInRides = function(parsedRidesData, cityName) {
-        for (var prCount = 0, len = parsedRidesData.length; prCount < len; prCount++) {
-            if (parsedRidesData.data.cityName == cityName)
-                return i;
+        for (var prCount = 0, len = parsedRidesData.data.length; prCount < len; prCount++) {
+            if (parsedRidesData.data[prCount].cityName == cityName)
+                return prCount;
         }
-    }
+        return -1;
+    };
+    app.getSampledata = function getSampledata() {
+        var sampleData = {
+            cityName: "",
+            distance: 0,
+            rideTime: 0,
+            waitTime: 0,
+            numberOfRides: 0
+        };
+        return sampleData;
+
+    };
     app.updateCards = function(data) {
         //var dataLastUpdated = new Date(data.created);
         var totalRides = data.count;
-        var cityNames = {};
+        var cityNames = "";
         var allRides = data.history;
-        var sampleData = {
-            cityName: "",
-            distance: "",
-            rideTime: "",
-            waitTime: "",
-            numberOfRides: ""
-        };
         var parsedRides = {
             count: [],
             data: []
         };
-        for (var i = 0, len = allRides.length; i < len; i++) {
-            console.log(parsedRides.data.length);
-            console.log(sampleData);
-            console.log(sampleData.cityName);
+        parsedRides.count = totalRides;
+        var tempData = app.getSampledata();
+        tempData.cityName = "Total";
+        tempData.numberOfRides = 1;
+        tempData.distance = allRides[0].distance;
+        tempData.rideTime = allRides[0].end_time - allRides[0].start_time;
+        tempData.waitTime = allRides[0].start_time - allRides[0].request_time;
+        parsedRides.data[0] = JSON.parse(JSON.stringify(tempData));
+        tempData.cityName = allRides[0].start_city.display_name;
+        parsedRides.data[1] = JSON.parse(JSON.stringify(tempData));
+        var j = 2;
+        cityNames = allRides[0].start_city.display_name;
+        for (var i = 1, len = allRides.length; i < len; i++) {
+            var loc = app.findCityInRides(parsedRides, allRides[i].start_city.display_name);
+            parsedRides.data[0].numberOfRides = parsedRides.data[0].numberOfRides + 1;
+            parsedRides.data[0].distance = parsedRides.data[0].distance + allRides[i].distance;
+            parsedRides.data[0].rideTime = parsedRides.data[0].rideTime + (allRides[i].end_time - allRides[i].start_time);
+            parsedRides.data[0].waitTime = parsedRides.data[0].waitTime + (allRides[i].start_time - allRides[i].request_time);
+            if (loc != -1) {
+                parsedRides.data[loc].numberOfRides = parsedRides.data[loc].numberOfRides + 1;
+                parsedRides.data[loc].distance = parsedRides.data[loc].distance + allRides[i].distance;
+                parsedRides.data[loc].rideTime = parsedRides.data[loc].rideTime + (allRides[i].end_time - allRides[i].start_time);
+                parsedRides.data[loc].waitTime = parsedRides.data[loc].waitTime + (allRides[i].start_time - allRides[i].request_time);
+            } else {
+                // parsedRides.data[j] = {
+                //     cityName: "",
+                //     distance: 0,
+                //     rideTime: 0,
+                //     waitTime: 0,
+                //     numberOfRides: 0
+                // };
+                parsedRides.data[j] = app.getSampledata();
+                parsedRides.data[j].cityName = allRides[i].start_city.display_name;
+                parsedRides.data[j].numberOfRides = 1;
+                parsedRides.data[j].distance = allRides[i].distance;
+                parsedRides.data[j].rideTime = (allRides[i].end_time - allRides[i].start_time);
+                parsedRides.data[j].waitTime = (allRides[i].start_time - allRides[i].request_time);
+                cityNames = cityNames + "," + parsedRides.data[j].cityName;
+                j++;
+            }
         }
-
-
-        console.log(i + " iiiiiiiiiiiiiiiiiiiii");
-        var card = app.visibleCards[data.key];
+        console.log(parsedRides);
+        console.log(cityNames);
+        console.log(" iiiiiiiiiiiiiiiiiiiii");
+        var card = app.visibleCards[parsedRides.data[0].cityName];
         if (!card) {
             card = app.cardTemplate.cloneNode(true);
             card.classList.remove('cardTemplate');
-            card.querySelector('.location').textContent = "Total";
+            card.querySelector('.location').textContent = parsedRides.data[0].cityNames;
             card.removeAttribute('hidden');
             app.container.appendChild(card);
-            app.visibleCards[data.key] = card;
+            app.visibleCards[parsedRides.data[0].cityName] = card;
         }
-        card.querySelector('.location').textContent = "Total";
-        card.querySelector('.numRides').textContent = data.count;
-
+        card.querySelector('.location').textContent = parsedRides.data[0].cityName;
+        card.querySelector('.numRides').textContent = parsedRides.data[0].numberOfRides;
+        card.querySelector('.WaitTime').textContent = parsedRides.data[0].waitTime + " seconds";
+        card.querySelector('.numCities').textContent = cityNames;
+        card.querySelector('.rideTime').textContent = parsedRides.data[0].rideTime + " seconds";
+        card.querySelector('.distance ').textContent = parsedRides.data[0].distance + " miles";
+        for (var i = 1; i < parsedRides.data.length; i++) {
+            var card = app.visibleCards[parsedRides.data[i].cityName];
+            if (!card) {
+                card = app.cardTemplate.cloneNode(true);
+                card.classList.remove('cardTemplate');
+                card.querySelector('.location').textContent = parsedRides.data[i].cityNames;
+                card.removeAttribute('hidden');
+                app.container.appendChild(card);
+                app.visibleCards[parsedRides.data[i].cityName] = card;
+            }
+            card.querySelector('.location').textContent = parsedRides.data[i].cityName;
+            card.querySelector('.numRides').textContent = parsedRides.data[i].numberOfRides;
+            card.querySelector('.WaitTime').textContent = parsedRides.data[i].waitTime + " seconds";
+            card.querySelector('.numCities').setAttribute('hidden', true);
+            card.querySelector('.rideTime').textContent = parsedRides.data[i].rideTime + " seconds";
+            card.querySelector('.distance ').textContent = parsedRides.data[i].distance + " miles";
+            console.log(parsedRides.data[i].cityName);
+        }
         if (app.isLoading) {
             app.spinner.setAttribute('hidden', true);
             app.container.removeAttribute('hidden');

@@ -286,7 +286,7 @@ body {
     -webkit-flex-grow: 1;
         -ms-flex-positive: 1;
             flex-grow: 1; }
-  .stats-card .current .RideTime:before {
+  .stats-card .current .rideTime:before {
     content: "Ride Time: ";
     color: #888; }
   .stats-card .current .numRides:before {
