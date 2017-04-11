@@ -249,7 +249,7 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
 
     document.getElementById('butRefresh').addEventListener('click', function() {
         // Refresh all of the forecasts
-        app.updateForecasts();
+        app.updateCards();
     });
 
     document.getElementById('butAdd').addEventListener('click', function() {
@@ -266,7 +266,7 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
         if (!app.selectedCities) {
             app.selectedCities = [];
         }
-        app.getForecast(key, label);
+        app.getdata(key, label);
         app.selectedCities.push({
             key: key,
             label: label
@@ -298,10 +298,22 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
 
     // Updates a weather card with the latest weather forecast. If the card
     // doesn't already exist, it's cloned from the template.
-    app.updateForecastCard = function(data) {
+    // result city-name: distance: numberofrides: waittime: ridetime:
+    app.updateCards = function(data) {
         //var dataLastUpdated = new Date(data.created);
         var totalRides = data.count;
+        var cityNames = {};
+        var allRides = data.history;
+        var parsedRides = {
+            count: [],
+            data:[]
+        };
+        for (var i = 0, len = allRides.length; i < len; i++) {
+            console.log("ride " + i + " in " + allRides[i].start_city.display_name);
+        }
 
+
+        console.log(i + " iiiiiiiiiiiiiiiiiiiii");
         var card = app.visibleCards[data.key];
         if (!card) {
             card = app.cardTemplate.cloneNode(true);
@@ -330,13 +342,13 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
 
     /*
      * Gets a forecast for a specific city and updates the card with the data.
-     * getForecast() first checks if the weather data is in the cache. If so,
+     * getdata() first checks if the weather data is in the cache. If so,
      * then it gets that data and populates the card with the cached data.
-     * Then, getForecast() goes to the network for fresh data. If the network
+     * Then, getdata() goes to the network for fresh data. If the network
      * request goes through, then the card gets updated a second time with the
      * freshest data.
      */
-    app.getForecast = function(key, label) {
+    app.getdata = function(key, label) {
 
         // // TODO add cache logic here
         // if ('caches' in window) {
@@ -352,7 +364,7 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
         //                 results.key = key;
         //                 results.label = label;
         //                 results.created = json.query.created;
-        //                 app.updateForecastCard(results);
+        //                 app.updateCards(results);
         //             });
         //         }
         //     });
@@ -367,11 +379,11 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
         //             results.key = key;
         //             results.label = label;
         //             results.created = response.query.created;
-        //             app.updateForecastCard(results);
+        //             app.updateCards(results);
         //         }
         //     } else {
         //         // Return the initial weather forecast since no data is available.
-        //         app.updateForecastCard(initialWeatherForecast);
+        //         app.updateCards(initialWeatherForecast);
         //     }
         // };
         // request.open('GET', url);
@@ -483,7 +495,7 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
                     console.log("done fetching");
                     console.log(JSON.stringify(result.history));
                     result.key = "total";
-                    app.updateForecastCard(result)
+                    app.updateCards(result)
                 }).catch(function(e) {
                     console.log("error", e);
                 });
@@ -494,186 +506,26 @@ google.maps.event.addDomListener(window, 'load', showGoogleMaps);
     };
 
     // Iterate all of the cards and attempt to get the latest forecast data
-    app.updateForecasts = function() {
-
-        app.getForecast(key);
-
+    app.updateCards = function() {
+        app.getdata();
     };
 
-    // TODO add saveSelectedCities function here
-    // Save list of cities to localStorage.
-    app.saveSelectedCities = function() {
-        var selectedCities = JSON.stringify(app.selectedCities);
-        localStorage.selectedCities = selectedCities;
-    };
+    // // TODO add saveSelectedCities function here
+    // // Save list of cities to localStorage.
+    // app.saveSelectedCities = function() {
+    //     var selectedCities = JSON.stringify(app.selectedCities);
+    //     localStorage.selectedCities = selectedCities;
+    // };
 
-    app.getIconClass = function(weatherCode) {
-        // Weather codes: https://developer.yahoo.com/weather/documentation.html#codes
-        weatherCode = parseInt(weatherCode);
-        switch (weatherCode) {
-            case 25: // cold
-            case 32: // sunny
-            case 33: // fair (night)
-            case 34: // fair (day)
-            case 36: // hot
-            case 3200: // not available
-                return 'clear-day';
-            case 0: // tornado
-            case 1: // tropical storm
-            case 2: // hurricane
-            case 6: // mixed rain and sleet
-            case 8: // freezing drizzle
-            case 9: // drizzle
-            case 10: // freezing rain
-            case 11: // showers
-            case 12: // showers
-            case 17: // hail
-            case 35: // mixed rain and hail
-            case 40: // scattered showers
-                return 'rain';
-            case 3: // severe thunderstorms
-            case 4: // thunderstorms
-            case 37: // isolated thunderstorms
-            case 38: // scattered thunderstorms
-            case 39: // scattered thunderstorms (not a typo)
-            case 45: // thundershowers
-            case 47: // isolated thundershowers
-                return 'thunderstorms';
-            case 5: // mixed rain and snow
-            case 7: // mixed snow and sleet
-            case 13: // snow flurries
-            case 14: // light snow showers
-            case 16: // snow
-            case 18: // sleet
-            case 41: // heavy snow
-            case 42: // scattered snow showers
-            case 43: // heavy snow
-            case 46: // snow showers
-                return 'snow';
-            case 15: // blowing snow
-            case 19: // dust
-            case 20: // foggy
-            case 21: // haze
-            case 22: // smoky
-                return 'fog';
-            case 24: // windy
-            case 23: // blustery
-                return 'windy';
-            case 26: // cloudy
-            case 27: // mostly cloudy (night)
-            case 28: // mostly cloudy (day)
-            case 31: // clear (night)
-                return 'cloudy';
-            case 29: // partly cloudy (night)
-            case 30: // partly cloudy (day)
-            case 44: // partly cloudy
-                return 'partly-cloudy-day';
-        }
-    };
-
-    /*
-     * Fake weather data that is presented when the user first uses the app,
-     * or when the user has not saved any cities. See startup code for more
-     * discussion.
-     */
-    var initialWeatherForecast = {
-        key: '2459115',
-        label: 'New York, NY',
-        created: '2016-07-22T01:00:00Z',
-        channel: {
-            astronomy: {
-                sunrise: "5:43 am",
-                sunset: "8:21 pm"
-            },
-            item: {
-                condition: {
-                    text: "Windy",
-                    date: "Thu, 21 Jul 2016 09:00 PM EDT",
-                    temp: 56,
-                    code: 24
-                },
-                forecast: [{
-                        code: 44,
-                        high: 86,
-                        low: 70
-                    },
-                    {
-                        code: 44,
-                        high: 94,
-                        low: 73
-                    },
-                    {
-                        code: 4,
-                        high: 95,
-                        low: 78
-                    },
-                    {
-                        code: 24,
-                        high: 75,
-                        low: 89
-                    },
-                    {
-                        code: 24,
-                        high: 89,
-                        low: 77
-                    },
-                    {
-                        code: 44,
-                        high: 92,
-                        low: 79
-                    },
-                    {
-                        code: 44,
-                        high: 89,
-                        low: 77
-                    }
-                ]
-            },
-            atmosphere: {
-                humidity: 56
-            },
-            wind: {
-                speed: 25,
-                direction: 195
-            }
-        }
-    };
-    // TODO uncomment line below to test app with fake data
-    // app.updateForecastCard(initialWeatherForecast);
 
     /************************************************************************
      *
      * Code required to start the app
-     *
-     * NOTE: To simplify this codelab, we've used localStorage.
-     *   localStorage is a synchronous API and has serious performance
-     *   implications. It should not be used in production applications!
-     *   Instead, check out IDB (https://www.npmjs.com/package/idb) or
-     *   SimpleDB (https://gist.github.com/inexorabletash/c8069c042b734519680c)
      ************************************************************************/
-
-    // TODO add startup code here
-    app.selectedCities = localStorage.selectedCities;
-    if (app.selectedCities) {
-        app.selectedCities = JSON.parse(app.selectedCities);
-        app.selectedCities.forEach(function(city) {
-            app.getForecast(city.key, city.label);
-        });
-    } else {
-        /* The user is using the app for the first time, or the user has not
-         * saved any cities, so show the user some fake data. A real app in this
-         * scenario could guess the user's location via IP lookup and then inject
-         * that data into the page.
-         */
-        app.updateForecastCard(initialWeatherForecast);
-        app.selectedCities = [{
-            key: initialWeatherForecast.key,
-            label: initialWeatherForecast.label
-        }];
-        app.saveSelectedCities();
-    }
-
-    // TODO add service worker code here
+//start loading  
+     app.getdata();
+  
+    // service worker 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker
             .register('./service-worker.js')

@@ -295,9 +295,12 @@ body {
   .stats-card .current .WaitTime:before {
     content: "Wait Time: ";
     color: #888; }
-  .stats-card .current .numCities:before {
-    content: "Number of Citites: ";
-    color: #888; }
+    .stats-card .current .numCities:before {
+      content: "Number of Citites: ";
+      color: #888; }
+      .stats-card .current .distance:before {
+        content: "Distance: ";
+        color: #888; }
 
 /*
 .stats-card .future {
