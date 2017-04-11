@@ -27,7 +27,28 @@
         addDialog: document.querySelector('.dialog-container'),
         daysOfWeek: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     };
-
+    app.QueryString = function() {
+        // This function is anonymous, is executed immediately and
+        // the return value is assigned to QueryString!
+        var query_string = {};
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            // If first entry with this name
+            if (typeof query_string[pair[0]] === "undefined") {
+                query_string[pair[0]] = decodeURIComponent(pair[1]);
+                // If second entry with this name
+            } else if (typeof query_string[pair[0]] === "string") {
+                var arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
+                query_string[pair[0]] = arr;
+                // If third or later entry with this name
+            } else {
+                query_string[pair[0]].push(decodeURIComponent(pair[1]));
+            }
+        }
+        return query_string;
+    };
 
     /*****************************************************************************
      *
@@ -40,10 +61,6 @@
         app.refreshCards();
     });
 
-    // document.getElementById('butAdd').addEventListener('click', function() {
-    //     // Open/show the add new city dialog
-    //     app.toggleAddDialog(true);
-    // });
 
     // document.getElementById('butAddCity').addEventListener('click', function() {
     //     // Add the newly selected city
@@ -215,7 +232,45 @@
      * freshest data.
      */
     app.getdata = function() {
+        var codeString = app.QueryString()
+        console.log(codeString);
+        var data = "client_secret:_QepKRSc0h11Am21rHt9109mFlHlG6V_O1AiJCLb\r\nclient_id:2oERX8EsijyRt8AlF8pZpCfEMFKIwM8p\r\ngrant_type:authorization_code\r\nredirect_uri:http://127.0.0.1:8887/\r\ncode:" + codeString.code;
+        var fetchAuthToken = "NA"
+        var xhr = new XMLHttpRequest();
+        xhr.withCredentials = false;
 
+        xhr.addEventListener("readystatechange", function() {
+            if (this.readyState === 4) {
+                console.log(this.responseText);
+                if (this.responseText != null)
+                    fetchAuthToken = this.responseText.access_token;
+            }
+        });
+
+        xhr.open("POST", "https://login.uber.com/oauth/v2/token?client_secret=_QepKRSc0h11Am21rHt9109mFlHlG6V_O1AiJCLb&client_id=2oERX8EsijyRt8AlF8pZpCfEMFKIwM8p&grant_type=authorization_code&redirect_uri=http%3A%2F%2F127.0.0.1%3A8887%2F&code=" + codeString.code);
+
+        xhr.send(data);
+
+        // var url1 = "https://login.uber.com/oauth/v2/token?client_secret=_QepKRSc0h11Am21rHt9109mFlHlG6V_O1AiJCLb&client_id=2oERX8EsijyRt8AlF8pZpCfEMFKIwM8p&grant_type=authorization_code&redirect_uri=http%3A%2F%2F127.0.0.1%3A8887%2F&code=" + codeString.code;
+        //
+        //
+        // var myHeaders1 = new Headers();
+        // myHeaders1.append("authorization", "Bearer " + authToken);
+        // var myInit1 = {
+        //     method: 'post',
+        //     headers: myHeaders1,
+        //     mode: 'cors',
+        //     cache: 'default',
+        //     data: data
+        // };
+        //
+        // var myRequest1 = new Request(url1);
+        // fetch(myRequest1, myInit1).then(function(response) {
+        //     console.log("fsf");
+        //     response.json().then(function(json) {
+        //         console.log(json);
+        //     });
+        // });
         // // TODO add cache logic here
         // if ('caches' in window) {
         //     /*
@@ -302,7 +357,11 @@
         // xhr.send(data);
         //promise
         var myHeaders = new Headers();
-        myHeaders.append("authorization", "Bearer " + authToken)
+        if (fetchAuthToken.length > 100) {
+            myHeaders.append("authorization", "Bearer " + fetchAuthToken);
+        } else {
+            myHeaders.append("authorization", "Bearer " + authToken);
+        }
         var myInit = {
             method: 'GET',
             headers: myHeaders,
