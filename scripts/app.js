@@ -234,7 +234,7 @@
     app.getdata = function() {
         var codeString = app.QueryString()
         console.log(codeString);
-        var data = "client_secret:_QepKRSc0h11Am21rHt9109mFlHlG6V_O1AiJCLb\r\nclient_id:2oERX8EsijyRt8AlF8pZpCfEMFKIwM8p\r\ngrant_type:authorization_code\r\nredirect_uri:http://127.0.0.1:8887/\r\ncode:" + codeString.code;
+        var data = "client_secret:_QepKRSc0h11Am21rHt9109mFlHlG6V_O1AiJCLb\r\nclient_id:2oERX8EsijyRt8AlF8pZpCfEMFKIwM8p\r\ngrant_type:authorization_code\r\nredirect_uri:" + window.location.href + "\r\ncode:" + codeString.code;
         var fetchAuthToken = "NA"
         var xhr = new XMLHttpRequest();
         xhr.withCredentials = false;
@@ -247,7 +247,7 @@
             }
         });
 
-        xhr.open("POST", "https://login.uber.com/oauth/v2/token?client_secret=_QepKRSc0h11Am21rHt9109mFlHlG6V_O1AiJCLb&client_id=2oERX8EsijyRt8AlF8pZpCfEMFKIwM8p&grant_type=authorization_code&redirect_uri=http%3A%2F%2F127.0.0.1%3A8887%2F&code=" + codeString.code);
+        xhr.open("POST", "https://login.uber.com/oauth/v2/token?client_secret=_QepKRSc0h11Am21rHt9109mFlHlG6V_O1AiJCLb&client_id=2oERX8EsijyRt8AlF8pZpCfEMFKIwM8p&grant_type=authorization_code&redirect_uri=" + encodeURIComponent(window.location.href) + "&code=" + codeString.code);
 
         xhr.send(data);
 
