@@ -340,6 +340,14 @@ body {
     content: "Ride Time: ";
     color: #888;
 }
+.stats-card .current .avgridetime:before {
+    content: "Avg Ride Time: ";
+    color: #888;
+}
+.stats-card .current .avgwaittime:before {
+    content: "Avg wait Time: ";
+    color: #888;
+}
 
 .stats-card .current .numRides:before {
     content: "Number of Rides: ";
