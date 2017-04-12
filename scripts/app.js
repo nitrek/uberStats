@@ -192,6 +192,8 @@
         card.querySelector('.numCities').textContent = cityNames;
         card.querySelector('.rideTime').textContent = parsedRides.data[0].rideTime + " seconds";
         card.querySelector('.distance ').textContent = parsedRides.data[0].distance + " miles";
+        card.querySelector('.avgwaittime').setAttribute('hidden', true);  
+        card.querySelector('.avgridetime').setAttribute('hidden', true);        
         for (var i = 1; i < parsedRides.data.length; i++) {
             var card = app.visibleCards[parsedRides.data[i].cityName];
             if (!card) {
@@ -208,6 +210,8 @@
             card.querySelector('.numCities').setAttribute('hidden', true);
             card.querySelector('.rideTime').textContent = parsedRides.data[i].rideTime + " seconds";
             card.querySelector('.distance ').textContent = parsedRides.data[i].distance + " miles";
+            card.querySelector('.avgwaittime').textContent = (parsedRides.data[i].waitTime /parsedRides.data[i].numberOfRides )+" seconds per ride"; 
+            card.querySelector('.avgridetime').textContent = (parsedRides.data[i].rideTime /parsedRides.data[i].numberOfRides )+" seconds per ride";
             console.log(parsedRides.data[i].cityName);
         }
         if (app.isLoading) {
