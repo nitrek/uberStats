@@ -15,8 +15,14 @@
 
 (function() {
     'use strict';
-    var authToken = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOlsiaGlzdG9yeSIsImhpc3RvcnlfbGl0ZSIsInBsYWNlcyIsInByb2ZpbGUiLCJyaWRlX3dpZGdldHMiXSwic3ViIjoiNzEyMGU5YjktYTkyMi00ODk1LWI3MWItMTE3ZTEyYjJlYzhkIiwiaXNzIjoidWJlci11czEiLCJqdGkiOiJiOTc3YWY5ZC1iZjJkLTRiMWMtYTMwYy04MTM2ZGRhYWRkNzkiLCJleHAiOjE0OTI2MTYyNDUsImlhdCI6MTQ5MDAyNDI0NSwidWFjdCI6Im9qcGRkQVpFeDQzM3l3VkJiR2VmSFVLd3lQeTNtMyIsIm5iZiI6MTQ5MDAyNDE1NSwiYXVkIjoiMm9FUlg4RXNpanlSdDhBbEY4cFpwQ2ZFTUZLSXdNOHAifQ.j7vUaP0VYf0BEYzXEBcvFMIVx_GQPU8opgPsXeRjx0YuINoxZRlw0qNzwoy-nLiGSXD79ILKWDZVthIRHXA0i0aPaHmYKCOIAbWU3aZTlgs5xyHsesbwVGruBOTguGpFY8OvLqcI46SzTPdSQs8UNi933z5hKKr2BuA81THCZjf-UJus9gYwV-jA08JHQfw7ga3QT7-Eq2lVaG0QYPqVJSlCoPb0k7efuCVtpHWmJgzbZR6KXAWTODR453ZQNZv3nRm0ObHPPBsuAVj2VpwgW1Deyoh0GuPdFSVC2nicIzmeLmkh4Yel67iyAnIniTBccQKb6_PQYkfixQeFWNUkHg";
-
+    var authTokenMy = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOlsiaGlzdG9yeSIsImhpc3RvcnlfbGl0ZSIsInBsYWNlcyIsInByb2ZpbGUiLCJyaWRlX3dpZGdldHMiXSwic3ViIjoiNzEyMGU5YjktYTkyMi00ODk1LWI3MWItMTE3ZTEyYjJlYzhkIiwiaXNzIjoidWJlci11czEiLCJqdGkiOiJiOTc3YWY5ZC1iZjJkLTRiMWMtYTMwYy04MTM2ZGRhYWRkNzkiLCJleHAiOjE0OTI2MTYyNDUsImlhdCI6MTQ5MDAyNDI0NSwidWFjdCI6Im9qcGRkQVpFeDQzM3l3VkJiR2VmSFVLd3lQeTNtMyIsIm5iZiI6MTQ5MDAyNDE1NSwiYXVkIjoiMm9FUlg4RXNpanlSdDhBbEY4cFpwQ2ZFTUZLSXdNOHAifQ.j7vUaP0VYf0BEYzXEBcvFMIVx_GQPU8opgPsXeRjx0YuINoxZRlw0qNzwoy-nLiGSXD79ILKWDZVthIRHXA0i0aPaHmYKCOIAbWU3aZTlgs5xyHsesbwVGruBOTguGpFY8OvLqcI46SzTPdSQs8UNi933z5hKKr2BuA81THCZjf-UJus9gYwV-jA08JHQfw7ga3QT7-Eq2lVaG0QYPqVJSlCoPb0k7efuCVtpHWmJgzbZR6KXAWTODR453ZQNZv3nRm0ObHPPBsuAVj2VpwgW1Deyoh0GuPdFSVC2nicIzmeLmkh4Yel67iyAnIniTBccQKb6_PQYkfixQeFWNUkHg";
+    var authTokenAnuj = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOlsicHJvZmlsZSIsInJpZGVfd2lkZ2V0cyIsImhpc3RvcnkiLCJwbGFjZXMiLCJoaXN0b3J5X2xpdGUiXSwic3ViIjoiMDE5NTY2MDctOWRjYy00OGNmLTlkZTAtOWU3M2E1MmUwMjU3IiwiaXNzIjoidWJlci11czEiLCJqdGkiOiJhZTBlMjdhOC05ODYyLTQwZmMtOWNlNC1iN2MzNTNhOGRlMzMiLCJleHAiOjE0OTQ2MDY4NTMsImlhdCI6MTQ5MjAxNDg1MiwidWFjdCI6ImNDdkhVQXo1N1FkQk5Ia1hCU1ltY2JvYXdCUXdDdSIsIm5iZiI6MTQ5MjAxNDc2MiwiYXVkIjoiMm9FUlg4RXNpanlSdDhBbEY4cFpwQ2ZFTUZLSXdNOHAifQ.hhT929h8Cs1wGMxhP1YiFcu0xC133Gr8AkS7MizoCZ9pJgJG3faRG6Pb5HRNwxOu_uuVI6zt9roswyW9L3CwGR5io5-1_AU8DVFEGqfkCuYX8CBUZDyjP48iUH3mV-NuZFqMu7bxFtHf5NZPyFVKex5GxM8j9PyejdXSwsa8sBzmpDLSHIoYqUncO0DjXUVebHALR_9CP0bQ20u8Mif-YFyyFtdTJ4NT20tg_5X9P0f5lmgW0jPBz-GgkYxYd7SD-esKtYBUTr6HFGTJMDNQm7Vz7TFKh3atABdT1QDDbytplxr5wJT2V45KTejDiMtUx8lvzytOPTenX08u590npg";
+    var authToken = authTokenMy;
+    var ch = Math.floor(Math.random() * 2);
+    if (ch == 0) {
+        console.log("Anuj's data");
+        authToken = authTokenAnuj;
+    }
     var app = {
         isLoading: true,
         visibleCards: {},
@@ -155,7 +161,7 @@
                 parsedRides.data[loc].distance = parsedRides.data[loc].distance + allRides[i].distance;
                 parsedRides.data[loc].rideTime = parsedRides.data[loc].rideTime + (allRides[i].end_time - allRides[i].start_time);
                 parsedRides.data[loc].waitTime = parsedRides.data[loc].waitTime + (allRides[i].start_time - allRides[i].request_time);
-                
+
             } else {
                 // parsedRides.data[j] = {
                 //     cityName: "",
@@ -193,7 +199,7 @@
         card.querySelector('.rideTime').textContent = parsedRides.data[0].rideTime + " seconds";
         card.querySelector('.distance ').textContent = parsedRides.data[0].distance + " miles";
         card.querySelector('.avgwaittime').setAttribute('hidden', true);  
-        card.querySelector('.avgridetime').setAttribute('hidden', true);        
+        card.querySelector('.avgridetime').setAttribute('hidden', true);       
         for (var i = 1; i < parsedRides.data.length; i++) {
             var card = app.visibleCards[parsedRides.data[i].cityName];
             if (!card) {
@@ -210,8 +216,8 @@
             card.querySelector('.numCities').setAttribute('hidden', true);
             card.querySelector('.rideTime').textContent = parsedRides.data[i].rideTime + " seconds";
             card.querySelector('.distance ').textContent = parsedRides.data[i].distance + " miles";
-            card.querySelector('.avgwaittime').textContent = (parsedRides.data[i].waitTime /parsedRides.data[i].numberOfRides )+" seconds per ride"; 
-            card.querySelector('.avgridetime').textContent = (parsedRides.data[i].rideTime /parsedRides.data[i].numberOfRides )+" seconds per ride";
+            card.querySelector('.avgwaittime').textContent = (parsedRides.data[i].waitTime / parsedRides.data[i].numberOfRides) + " seconds per ride"; 
+            card.querySelector('.avgridetime').textContent = (parsedRides.data[i].rideTime / parsedRides.data[i].numberOfRides) + " seconds per ride";
             console.log(parsedRides.data[i].cityName);
         }
         if (app.isLoading) {
