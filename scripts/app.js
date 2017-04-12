@@ -155,6 +155,7 @@
                 parsedRides.data[loc].distance = parsedRides.data[loc].distance + allRides[i].distance;
                 parsedRides.data[loc].rideTime = parsedRides.data[loc].rideTime + (allRides[i].end_time - allRides[i].start_time);
                 parsedRides.data[loc].waitTime = parsedRides.data[loc].waitTime + (allRides[i].start_time - allRides[i].request_time);
+                
             } else {
                 // parsedRides.data[j] = {
                 //     cityName: "",
